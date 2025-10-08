@@ -1,9 +1,18 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
-from fastapi.responses import JSONResponse
 
-app = FastAPI(title="Risk Assessment API", version="1.0")
+app = FastAPI(title="Risk Assessment API", version="1.1")
+
+# --- Enable CORS for all origins (required for GPT Actions) ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- DBS Strategic Asset Allocation (SAA) ---
 SAA = {
@@ -21,7 +30,7 @@ class RequestBody(BaseModel):
     risk_profile: str
     current_allocation: List[Allocation]
 
-# --- API endpoint ---
+# --- POST endpoint ---
 @app.post("/risk/assess")
 def assess_risk(body: RequestBody):
     profile = body.risk_profile
@@ -40,19 +49,10 @@ def assess_risk(body: RequestBody):
                 "status": "Overweight" if delta > 0 else "Underweight"
             })
 
-    # Always return valid JSON + CORS headers for ChatGPT Actions
-    return JSONResponse(
-        content={"risk_profile": profile, "deviations": deviations},
-        status_code=200,
-        headers={
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type"
-        }
-    )
+    # Return plain dict (FastAPI will handle JSON + headers correctly)
+    return {"risk_profile": profile, "deviations": deviations}
 
-# --- Optional root route (sanity check) ---
+# --- Root endpoint for sanity check ---
 @app.get("/")
 def root():
     return {"message": "DBS RiskCalc API is running", "endpoints": ["/risk/assess"]}
