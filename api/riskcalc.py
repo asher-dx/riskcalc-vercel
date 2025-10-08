@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
+from fastapi.responses import JSONResponse
 
 app = FastAPI(title="Risk Assessment API", version="1.0")
 
@@ -33,4 +34,4 @@ def assess_risk(body: RequestBody):
                 "delta": round(delta, 2),
                 "status": "Overweight" if delta > 0 else "Underweight"
             })
-    return {"risk_profile": profile, "deviations": deviations}
+    return JSONResponse(content={"risk_profile": profile, "deviations": deviations})
