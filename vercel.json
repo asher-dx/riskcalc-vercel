@@ -1,0 +1,8 @@
+{
+  "builds": [
+    { "src": "api/riskcalc.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "api/riskcalc.py" }
+  ]
+}
