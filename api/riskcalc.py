@@ -72,3 +72,17 @@ def assess_risk(body: RequestBody):
 @app.get("/")
 def root():
     return {"message": "DBS RiskCalc API is running", "endpoints": ["/risk/assess"]}
+
+@app.get("/privacy")
+def privacy():
+    """Public Privacy Policy endpoint for GPT publishing."""
+    return {
+        "title": "Privacy Policy",
+        "content": (
+            "This GPT does not collect, store, or share user data. "
+            "Any data retrieved via Google APIs (Sheets, Drive) is used only in-session "
+            "for display and analysis. No personal information or client data is retained "
+            "or transmitted to third parties. All API access is read-only and secured via service account credentials."
+        ),
+    }
+
